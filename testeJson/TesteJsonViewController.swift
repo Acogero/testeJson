@@ -29,7 +29,6 @@ class TesteJsonViewController: UIViewController {
     
     private func lerDados(){
         if opcao != nil {
-            print("appDelegate: \(appDelegate.nome)")
         }
     }
     @IBAction func textNome(_ sender: Any) {

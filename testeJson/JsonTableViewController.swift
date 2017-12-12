@@ -168,9 +168,6 @@ extension JsonTableViewController {
             
             delegateOpcoes.selecionar(tipo: tipoOpcoes, cliente: opcao)
             appDelegate.num = 0
-            appDelegate.nome = opcao.nome
-            
-            print("appDelegate: \(appDelegate.nome)")
         }
         
         if let _navigationController = self.navigationController {

@@ -23,6 +23,8 @@ class PesquisaViewController: UITableViewController {
     var pesquisando: Bool = false
     var tintColor: UIColor!
     
+    var appDelegate: AppDelegate!
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -49,7 +51,7 @@ class PesquisaViewController: UITableViewController {
         if let _navigationController = self.navigationController {
             _navigationController.navigationBar.isTranslucent = false
             _navigationController.navigationBar.titleTextAttributes = [NSForegroundColorAttributeName: UIColor.black]
-            _navigationController.navigationBar.tintColor = UIColor.blue
+            _navigationController.navigationBar.tintColor = UIColor.black
         }
     }
     
@@ -87,17 +89,21 @@ extension PesquisaViewController: UISearchBarDelegate {
     /** - Função para exibir o que foi digitado pelo usuário. */
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
         if searchText == "" {
+            print("searchBar: vazio")
             pesquisando = false
         } else {
             pesquisando = true
             opcoesPesquisadas = opcoes.filter({
-                
+                print("searchBar: nao vazio")
                 if let opcao = $0 as? Clientes {
-                    if let searchId = Int(searchText) {
-                        return opcao.id == searchId
-                    }
+                    //if let searchId = Int(searchText) {
+                    //    return opcao.id == searchId
+                    //    print("searchBar ID: \(searchId)")
+                   // }
                     
+                    print("searchBar opcao: \(String(describing: opcao.nomeCliente()))")
                     if let _nome: String = opcao.nome {
+                        print("searchBar Nome: \(_nome)")
                         return _nome.range(of: searchText, options: [NSString.CompareOptions.caseInsensitive, NSString.CompareOptions.diacriticInsensitive]) != nil
                     }
                     
@@ -153,7 +159,7 @@ extension PesquisaViewController {
         if let opcao = opcoesParaIndexPath(indexPath: indexPath as NSIndexPath) as? String {
             descricaoOpcao = opcao
         } else if let opcao = opcoesParaIndexPath(indexPath: indexPath as NSIndexPath) as? Clientes {
-            descricaoOpcao = opcao.nome
+            descricaoOpcao = opcao.nomeCliente()
         }
         
         if let label = cell!.textLabel {
@@ -161,7 +167,6 @@ extension PesquisaViewController {
             label.textColor = UIColor.blue
             label.text = descricaoOpcao
         }
-        
         return cell!
     }
     
@@ -177,6 +182,8 @@ extension PesquisaViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if let opcao = opcoesParaIndexPath(indexPath: indexPath as NSIndexPath) as? Clientes {
             
+            appDelegate.num = 0
+            print("DidSelect: \(String(describing: opcao.nomeCliente()))")
             delegateOpcoes.seleciona(tipo: tipoOpcoes, cliente: opcao)
             
         }

@@ -9,6 +9,7 @@
 import UIKit
 import Material
 import Foundation
+import SVProgressHUD
 
 class JsonTesteTableViewController: UIViewController {
 
@@ -20,7 +21,19 @@ class JsonTesteTableViewController: UIViewController {
     
     var clientes: [Clientes] = [Clientes]()
     var validarCliente: String = ""
-    var codigoCliente: Int = -1
+    var validarID: Int = -1
+    var validarUser: String = ""
+    var validarImagem: UIImage?
+    
+    
+    //parte 2
+    
+    @IBOutlet weak var seuId: UILabel!
+    @IBOutlet weak var seuNome: UILabel!
+    @IBOutlet weak var suaFoto: UIImageView!
+    @IBOutlet weak var seuUsuario: UILabel!
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -36,7 +49,10 @@ class JsonTesteTableViewController: UIViewController {
     
     @IBAction func btnVoce(_ sender: Any) {
         print("btnVoce")
-         getJson()
+        SVProgressHUD.show()
+        self.clientes.removeAll()
+         novoJson()
+        
     }
     
     private func validarCampo() -> Bool {
@@ -57,10 +73,47 @@ class JsonTesteTableViewController: UIViewController {
         return (!clienteNome.isEmpty)
     }
     
+    private func novoJson(){
+        let url: URL = URL(string: urlString)!
+        print("novoJson")
+        
+        URLSession.shared.dataTask(with: url, completionHandler: {
+            
+            data, response, error in
+        print("dataTask")
+            guard error == nil else {
+                print("ERROR")
+                return
+            }
+            
+            guard let data = data else {
+                print("DATA")
+                return
+            }
+            
+            do {
+                print("DO")
+                let json = try JSONSerialization.jsonObject(with: data, options: .mutableContainers) as! [NSDictionary]
+                
+                for dict in json {
+                    self.itemList.append(Clientes.clienteJson(dict: dict).nome)
+                }
+                SVProgressHUD.dismiss()
+            } catch let error {
+                print(error.localizedDescription)
+            }
+        }).resume()
+        
+        
+        self.txtViewVoce.isErrorRevealed = false
+        self.visualizaOpcoes(tipoOpcao: .cliente, titulo: "Quem é você? ", opcoes: self.itemList as [AnyObject])
+    }
+    
+    
     private func getJson(){
         let url: URL = URL(string: urlString)!
         print("getJson")
-        URLSession.shared.dataTask(with: url){ (data, response, error) in
+        URLSession.shared.dataTask(with: url ){ (data, response, error) in
             if error != nil {
                 print("ERROR: ")
                 print(error!)
@@ -74,12 +127,12 @@ class JsonTesteTableViewController: UIViewController {
                     }
                     
                     self.txtViewVoce.isErrorRevealed = false
-                    self.visualizaOpcoes(tipoOpcao: .cliente, titulo: "Quem é você? ", opcoes: self.clientes as [AnyObject])
+                    self.visualizaOpcoes(tipoOpcao: .cliente, titulo: "Quem é você? ", opcoes: self.itemList as [AnyObject])
                 } catch let error as NSError {
                     print(error)
                 }
             }
-            }.resume()
+            }//.resume()
     }
     
     /** - Exibe as opções retornada pelo servidor.*/
@@ -99,8 +152,19 @@ extension JsonTesteTableViewController: PesquisaViewControllerProtocol {
     func seleciona(tipo: EnumTipoOpcoes, cliente: Clientes?) {
         print("JsonTesteTableViewController")
         if let clienteSelecionado = cliente {
-            if let _nomeCliente: String = clienteSelecionado.nome {
-                self.validarCliente = _nomeCliente
+            if let existeNome = clienteSelecionado.nome {
+                if let existeId: Int = clienteSelecionado.id {
+                    if let existeImagem: UIImage = clienteSelecionado.imagem {
+                        if let existeUser: String = clienteSelecionado.userName {
+                            self.validarID = existeId
+                            self.validarCliente = existeNome
+                            self.validarImagem = existeImagem
+                            self.validarUser = existeUser
+                            
+                            self.seuId.text = clienteSelecionado.nomeCliente()
+                        }
+                    }
+                }
             }
         }
     }

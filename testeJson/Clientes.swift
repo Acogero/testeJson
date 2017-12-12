@@ -23,6 +23,23 @@ class Clientes {
         self.userName = userName
     }
     
+    /** - returns: Descrição cliente */
+    func idCliente() -> Int? {
+        if let _id = self.id {
+            return _id
+        }
+        return -1
+    }
+    
+    func nomeCliente() -> String? {
+        if let nome = self.nome {
+            return String(format: nome)
+        }
+        
+        return nil
+    }
+    
+    
     class func clienteJson(dict: NSDictionary) -> Clientes {
         
         var idCliente: Int?
